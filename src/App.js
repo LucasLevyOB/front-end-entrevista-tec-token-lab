@@ -1,15 +1,13 @@
 import React from 'react';
-import { ChakraProvider, theme } from '@chakra-ui/react';
+import { ColorModeScript, ChakraProvider } from '@chakra-ui/react';
+
 import Routes from './routes';
-// import { ColorModeSwitcher } from './ColorModeSwitcher';
-// import { Logo } from './Logo';
-{
-  /* <ColorModeSwitcher justifySelf="flex-end" /> */
-}
+import theme from './theme';
 
 function App() {
   return (
     <ChakraProvider theme={theme}>
+      <ColorModeScript initialColorMode={theme.config.initialColorMode} />
       <Routes />
     </ChakraProvider>
   );

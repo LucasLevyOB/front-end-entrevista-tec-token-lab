@@ -2,9 +2,9 @@ import {
   Box,
   Flex,
   Avatar,
-  Link,
   Button,
   Menu,
+  Link as ChakraLink,
   MenuButton,
   MenuList,
   MenuItem,
@@ -22,8 +22,10 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
 
+import { Link } from 'react-router-dom';
+
 const NavLink = ({ children }) => (
-  <Link
+  <ChakraLink
     px={2}
     py={1}
     rounded={'md'}
@@ -34,7 +36,7 @@ const NavLink = ({ children }) => (
     href={'#'}
   >
     {children}
-  </Link>
+  </ChakraLink>
 );
 
 const Links = ['Dashboard', 'Projects', 'Team'];
@@ -101,9 +103,9 @@ const Navbar = () => {
                   </Center>
                   <br />
                   <MenuDivider />
-                  <MenuItem>Your Servers</MenuItem>
-                  <MenuItem>Account Settings</MenuItem>
-                  <MenuItem>Logout</MenuItem>
+                  <Link to={'/signin'}>
+                    <MenuItem>Sair</MenuItem>
+                  </Link>
                 </MenuList>
               </Menu>
             </Stack>
