@@ -9,7 +9,6 @@ const FormControlInput = ({
   register,
   errors,
   control,
-  defaultValue = '',
   ...props
 }) => {
   return (

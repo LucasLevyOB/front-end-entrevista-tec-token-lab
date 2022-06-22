@@ -11,6 +11,7 @@ import {
   PopoverFooter,
   PopoverHeader,
   PopoverTrigger,
+  Portal,
   Text,
   useDisclosure,
 } from '@chakra-ui/react';
@@ -33,52 +34,57 @@ const EventPopover = forwardRef(({ event, date }, ref) => {
 
   return (
     <Popover
-      returnFocusOnClose={false}
       initialFocusRef={ref}
       isOpen={isOpen}
       onClose={onClose}
-      placement="right"
+      placement="left"
       closeOnBlur={true}
       isLazy
+      lazyBehavior="keepMounted"
+      left="0px"
+      top="0px"
     >
       <PopoverTrigger>
         <EventTag title={event.title} ref={refTag} onClick={onToggle} />
       </PopoverTrigger>
-      <PopoverContent>
-        <PopoverHeader>
-          <Flex justifyContent="space-between" alignItems="center">
-            <Text fontWeight="semibold">{event.title}</Text>
-            <ButtonGroup variant="outline" size="sm">
-              <IconButton
-                aria-label="Editar Evento"
-                icon={<EditIcon />}
-                onClick={handleIsReadOnly}
-                colorScheme="blue"
-              />
-              <IconButton
-                aria-label="Editar Evento"
-                icon={<DeleteIcon />}
-                colorScheme="red"
-              />
-              <IconButton
-                aria-label="Fechar Popover"
-                icon={<CloseIcon />}
-                colorScheme="gray"
-                onClick={onClose}
-              />
-            </ButtonGroup>
-          </Flex>
-        </PopoverHeader>
-        <PopoverArrow />
-        <PopoverBody>
-          <FormEvent
-            event={event}
-            date={date}
-            isReadOnly={isReadOnly}
-            handleIsReadOnly={handleIsReadOnly}
-          />
-        </PopoverBody>
-      </PopoverContent>
+      <Portal>
+        <PopoverContent>
+          <PopoverHeader>
+            <Flex justifyContent="space-between" alignItems="center">
+              <Text fontWeight="semibold">{event.title}</Text>
+              <ButtonGroup variant="outline" size="sm">
+                <IconButton
+                  aria-label="Editar Evento"
+                  icon={<EditIcon />}
+                  onClick={handleIsReadOnly}
+                  colorScheme="blue"
+                />
+                <IconButton
+                  aria-label="Editar Evento"
+                  icon={<DeleteIcon />}
+                  colorScheme="red"
+                />
+                <IconButton
+                  aria-label="Fechar Popover"
+                  icon={<CloseIcon />}
+                  colorScheme="gray"
+                  onClick={onClose}
+                />
+              </ButtonGroup>
+            </Flex>
+          </PopoverHeader>
+          <PopoverArrow />
+          <PopoverBody>
+            <FormEvent
+              event={event}
+              date={date}
+              isReadOnly={isReadOnly}
+              isEditing={true}
+              handleIsReadOnly={handleIsReadOnly}
+            />
+          </PopoverBody>
+        </PopoverContent>
+      </Portal>
     </Popover>
   );
 });

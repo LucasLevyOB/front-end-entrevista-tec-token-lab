@@ -1,31 +1,26 @@
 import {
-  Button,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
-  ModalFooter,
   ModalHeader,
   ModalOverlay,
 } from '@chakra-ui/react';
+import moment from 'moment';
 import FormEvent from '../FormEvent';
 
-const CreateEvent = ({ children, isOpen, onClose, date }) => {
+const CreateEvent = ({ isOpen, onClose, date }) => {
+  const datePtBr = moment(date).format('dddd, DD [de] MMMM [de] YYYY');
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Modal Title</ModalHeader>
+        <ModalHeader>Criar Evento para {datePtBr}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <FormEvent date={date} isEditing={true} isReadOnly={false} />
+          <FormEvent date={date} isReadOnly={false} onCancel={onClose} />
         </ModalBody>
-        <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={onClose}>
-            Close
-          </Button>
-          <Button variant="ghost">Secondary Action</Button>
-        </ModalFooter>
       </ModalContent>
     </Modal>
   );

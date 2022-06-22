@@ -1,11 +1,11 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
 import moment from 'moment';
 
+import { Box, Button, ButtonGroup } from '@chakra-ui/react';
+
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
-
-import { Box, Button, ButtonGroup } from '@chakra-ui/react';
 
 import FormControlInput from '../FormControlInput';
 import validationSchema from './validationSchema';
@@ -13,14 +13,15 @@ import validationSchema from './validationSchema';
 const FormEvent = ({
   event = null,
   isReadOnly = false,
-  handleIsReadOnly,
+  handleIsReadOnly = null,
+  onCancel = null,
+  isEditing = false,
   date,
 }) => {
   const {
     register,
     handleSubmit,
     control,
-    reset,
     setValue,
     formState: { errors },
   } = useForm({
@@ -31,27 +32,34 @@ const FormEvent = ({
       dateEnd: '',
     },
   });
-  const inputRef = useRef(null);
 
   const onSubmit = data => {
     console.log(data);
-    handleIsReadOnly();
+    handleCancel();
   };
 
-  useEffect(() => {
-    inputRef.current.focus();
-  }, [isReadOnly]);
+  function handleCancel() {
+    if (handleIsReadOnly) {
+      handleIsReadOnly();
+    }
+    if (onCancel) {
+      onCancel();
+    }
+  }
 
   useEffect(() => {
     if (event) {
       setValue('description', event.description);
       setValue('dateBegin', moment(event.dateBegin).format('YYYY-MM-DDTHH:mm'));
       setValue('dateEnd', moment(event.dateEnd).format('YYYY-MM-DDTHH:mm'));
+    } else {
+      setValue('dateBegin', moment(date + 'T00:00').format('YYYY-MM-DDTHH:mm'));
+      setValue('dateEnd', moment(date + 'T23:59').format('YYYY-MM-DDTHH:mm'));
     }
   }, [event]);
 
   return (
-    <Box as="form" onSubmit={handleSubmit(onSubmit)} ref={inputRef}>
+    <Box as="form" onSubmit={handleSubmit(onSubmit)}>
       <FormControlInput
         id="description"
         label="Descrição do evento"
@@ -71,7 +79,7 @@ const FormEvent = ({
         errors={errors?.dateBegin}
         control={control}
         type="datetime-local"
-        min={moment(date).format('YYYY-MM-DDTHH:mm')}
+        min={moment(date + 'T00:00').format('YYYY-MM-DDTHH:mm')}
         max={moment(date + 'T23:59').format('YYYY-MM-DDTHH:mm')}
         placeholder="Início"
         isReadOnly={isReadOnly}
@@ -85,21 +93,17 @@ const FormEvent = ({
         control={control}
         type="datetime-local"
         placeholder="Término"
-        min={moment(date).format('YYYY-MM-DDTHH:mm')}
+        min={moment(date + 'T00:00').format('YYYY-MM-DDTHH:mm')}
         isReadOnly={isReadOnly}
       />
       <Box w="full" display="flex" justifyContent="end">
         {!isReadOnly && (
           <ButtonGroup size="sm" mt="4">
-            <Button
-              variant="outline"
-              colorScheme="red"
-              onClick={handleIsReadOnly}
-            >
+            <Button variant="outline" colorScheme="red" onClick={handleCancel}>
               Cancelar
             </Button>
             <Button type="submit" colorScheme="blue">
-              Atualizar
+              {isEditing ? 'Atualizar' : 'Salvar'}
             </Button>
           </ButtonGroup>
         )}

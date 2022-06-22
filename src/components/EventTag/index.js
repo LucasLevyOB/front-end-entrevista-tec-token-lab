@@ -10,11 +10,17 @@ const EventTag = forwardRef(({ title, onClick }, ref) => {
       ref={ref}
       role="button"
       onClick={onClick}
-      size="md"
+      size={['sm', 'sm', 'md']}
       variant="outline"
       colorScheme="blue"
+      width="100%"
+      tabIndex={0}
     >
-      <TagLeftIcon boxSize="16px" as={EventIcon} />
+      <TagLeftIcon
+        boxSize="16px"
+        as={EventIcon}
+        display={['none', 'none', 'block']}
+      />
       <TagLabel title={title}>{title}</TagLabel>
     </Tag>
   );
