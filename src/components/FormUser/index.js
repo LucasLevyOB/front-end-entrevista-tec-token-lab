@@ -20,7 +20,7 @@ const defaultValueSignIn = {
   password: '',
 };
 
-const FormUser = ({ isSignUp }) => {
+const FormUser = ({ isSignUp, submitAction }) => {
   const {
     register,
     handleSubmit,
@@ -34,9 +34,9 @@ const FormUser = ({ isSignUp }) => {
     defaultValues: isSignUp ? defaultValueSignUp : defaultValueSignIn,
   });
 
-  const onSubmit = data => {
-    console.log(data);
-    reset();
+  const onSubmit = async data => {
+    const success = await submitAction(data);
+    if (success) reset();
   };
 
   return (
@@ -97,7 +97,7 @@ const FormUser = ({ isSignUp }) => {
             bg: 'blue.500',
           }}
         >
-          Entrar
+          {isSignUp ? 'Cadastrar' : 'Entrar'}
         </Button>
       </Stack>
       <Text fontSize={'lg'} textAlign="center" color={'gray.600'} mt="10">

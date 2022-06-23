@@ -13,11 +13,14 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 
 import EventPopover from '../EventPopover';
+import { useEffect } from 'react';
+import { getEventsByUserId } from '../../api/events';
+import { memo } from 'react';
 
 const Day = ({
   day,
   isToday,
-  eventsForDate = [],
+  hasEvents = {},
   date,
   handleDateForCreateEvent,
   onClick,
@@ -28,6 +31,44 @@ const Day = ({
   const bgColorDay = useColorModeValue('white', 'gray.700');
   const borderColorDay = useColorModeValue('gray.100', 'gray.500');
   const bgColorIsToday = useColorModeValue('blackAlpha.100', 'whiteAlpha.100');
+  const [events, setEvents] = useState([]);
+  const userId = localStorage.getItem('usr_id');
+  // console.log(date);
+
+  async function getEvents() {
+    try {
+      const response = await getEventsByUserId(userId, date);
+      if (response.status === 200) setEvents(response.data);
+      else console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  function handleEvents(action) {
+    switch (action.type) {
+      case 'DELETE':
+        const newEvents = events.filter(
+          event => event.eve_id !== action.payload
+        );
+        setEvents(newEvents);
+        break;
+      case 'UPDATE':
+        const updatedEvents = events.map(event =>
+          event.eve_id === action.payload.eve_id ? action.payload : event
+        );
+        setEvents(updatedEvents);
+        break;
+      default:
+        break;
+    }
+  }
+
+  useEffect(() => {
+    if (hasEvents.counter && date) {
+      getEvents();
+    }
+  }, [hasEvents]);
 
   if (!day)
     return (
@@ -63,6 +104,7 @@ const Day = ({
   return (
     <Box position="relative" h="148px" width="calc(100% - 1px)">
       <Flex
+        minH="148px"
         h={show ? 'auto' : '148px'}
         width="full"
         border="1px"
@@ -98,24 +140,25 @@ const Day = ({
           </Flex>
           <VStack as="main" mt="2">
             <VStack height={show ? 'auto' : '56px'} overflow="hidden">
-              {eventsForDate &&
-                eventsForDate.map((event, index) => (
+              {events &&
+                events.map((event, index) => (
                   <EventPopover
                     key={index}
                     event={event}
+                    handleEvents={handleEvents}
                     date={date}
                     ref={refEvent}
                   />
                 ))}
             </VStack>
-            {eventsForDate.length > 2 && !show && (
+            {events.length > 2 && !show && (
               <Button
                 ref={refEvent}
                 onClick={handleShow}
                 variant="ghost"
                 size="sm"
               >
-                Mais {eventsForDate.length - 2}
+                Mais {events.length - 2}
               </Button>
             )}
           </VStack>
@@ -125,4 +168,8 @@ const Day = ({
   );
 };
 
-export default Day;
+function areEqual(prevProps, nextProps) {
+  return prevProps.hasEvents === nextProps.hasEvents;
+}
+
+export default memo(Day, areEqual);

@@ -17,6 +17,7 @@ const FormEvent = ({
   onCancel = null,
   isEditing = false,
   date,
+  submitAction,
 }) => {
   const {
     register,
@@ -27,15 +28,33 @@ const FormEvent = ({
   } = useForm({
     resolver: yupResolver(validationSchema),
     defaultValues: {
-      description: '',
-      dateBegin: '',
-      dateEnd: '',
+      title: 'Sem Título',
+      description: 'Sem Descrição',
+      fullDateBegin: '',
+      fullDateEnd: '',
     },
   });
 
-  const onSubmit = data => {
-    console.log(data);
-    handleCancel();
+  const onSubmit = async data => {
+    const success = await submitAction(data);
+    if (isEditing && success) {
+      handleCancel();
+    } else if (isEditing && !success) {
+      setValue('title', event.eve_title);
+      setValue('description', event.eve_description);
+      setValue(
+        'fullDateBegin',
+        moment(event.eve_date_begin + 'T' + event.eve_time_begin).format(
+          'YYYY-MM-DDTHH:mm'
+        )
+      );
+      setValue(
+        'fullDateEnd',
+        moment(event.eve_date_end + 'T' + event.eve_time_end).format(
+          'YYYY-MM-DDTHH:mm'
+        )
+      );
+    }
   };
 
   function handleCancel() {
@@ -49,17 +68,45 @@ const FormEvent = ({
 
   useEffect(() => {
     if (event) {
-      setValue('description', event.description);
-      setValue('dateBegin', moment(event.dateBegin).format('YYYY-MM-DDTHH:mm'));
-      setValue('dateEnd', moment(event.dateEnd).format('YYYY-MM-DDTHH:mm'));
+      setValue('title', event.eve_title);
+      setValue('description', event.eve_description);
+      setValue(
+        'fullDateBegin',
+        moment(event.eve_date_begin + 'T' + event.eve_time_begin).format(
+          'YYYY-MM-DDTHH:mm'
+        )
+      );
+      setValue(
+        'fullDateEnd',
+        moment(event.eve_date_end + 'T' + event.eve_time_end).format(
+          'YYYY-MM-DDTHH:mm'
+        )
+      );
     } else {
-      setValue('dateBegin', moment(date + 'T00:00').format('YYYY-MM-DDTHH:mm'));
-      setValue('dateEnd', moment(date + 'T23:59').format('YYYY-MM-DDTHH:mm'));
+      setValue(
+        'fullDateBegin',
+        moment(date + 'T00:00').format('YYYY-MM-DDTHH:mm')
+      );
+      setValue(
+        'fullDateEnd',
+        moment(date + 'T23:59').format('YYYY-MM-DDTHH:mm')
+      );
     }
   }, [event]);
 
   return (
     <Box as="form" onSubmit={handleSubmit(onSubmit)}>
+      <FormControlInput
+        id="title"
+        label="Título do evento"
+        registerName="title"
+        register={register}
+        errors={errors?.title}
+        control={control}
+        type="text"
+        placeholder="Título do evento"
+        isReadOnly={isReadOnly}
+      />
       <FormControlInput
         id="description"
         label="Descrição do evento"
@@ -72,28 +119,28 @@ const FormEvent = ({
         isReadOnly={isReadOnly}
       />
       <FormControlInput
-        id="dateBegin"
+        id="fullDateBegin"
         label="Início"
-        registerName="dateBegin"
+        registerName="fullDateBegin"
         register={register}
-        errors={errors?.dateBegin}
+        errors={errors?.fullDateBegin}
         control={control}
         type="datetime-local"
-        min={moment(date + 'T00:00').format('YYYY-MM-DDTHH:mm')}
-        max={moment(date + 'T23:59').format('YYYY-MM-DDTHH:mm')}
+        // min={moment(date + 'T00:00').format('YYYY-MM-DDTHH:mm')}
+        // max={moment(date + 'T23:59').format('YYYY-MM-DDTHH:mm')}
         placeholder="Início"
         isReadOnly={isReadOnly}
       />
       <FormControlInput
-        id="dateEnd"
+        id="fullDateEnd"
         label="Término"
-        registerName="dateEnd"
+        registerName="fullDateEnd"
         register={register}
-        errors={errors?.dateEnd}
+        errors={errors?.fullDateEnd}
         control={control}
         type="datetime-local"
         placeholder="Término"
-        min={moment(date + 'T00:00').format('YYYY-MM-DDTHH:mm')}
+        // min={moment(date + 'T00:00').format('YYYY-MM-DDTHH:mm')}
         isReadOnly={isReadOnly}
       />
       <Box w="full" display="flex" justifyContent="end">

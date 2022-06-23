@@ -22,7 +22,7 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
 
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const NavLink = ({ children }) => (
   <ChakraLink
@@ -44,6 +44,16 @@ const Links = ['Dashboard', 'Projects', 'Team'];
 const Navbar = () => {
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const navigate = useNavigate();
+  const userName = localStorage.getItem('usr_name');
+
+  function logout() {
+    localStorage.removeItem('usr_id');
+    localStorage.removeItem('usr_name');
+    localStorage.removeItem('usr_email');
+    navigate('/signin');
+  }
+
   return (
     <>
       <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
@@ -99,13 +109,11 @@ const Navbar = () => {
                   </Center>
                   <br />
                   <Center>
-                    <p>Username</p>
+                    <p>{userName}</p>
                   </Center>
                   <br />
                   <MenuDivider />
-                  <Link to={'/signin'}>
-                    <MenuItem>Sair</MenuItem>
-                  </Link>
+                  <MenuItem onClick={logout}>Sair</MenuItem>
                 </MenuList>
               </Menu>
             </Stack>
