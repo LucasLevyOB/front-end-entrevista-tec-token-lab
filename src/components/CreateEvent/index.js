@@ -22,6 +22,13 @@ const CreateEvent = ({
   const userId = localStorage.getItem('usr_id');
   const toast = useToast();
 
+  function formatTitleEvents(events) {
+    const conflitingEvents = events.reduce((_, curr) => {
+      return `${curr.eve_title},`;
+    }, '').replace(/,$/, '.');
+    return conflitingEvents;
+  }
+
   function updateDaysHaveEvents() {
     console.log(
       daysHaveEvents[date]?.counter ? daysHaveEvents[date].counter + 1 : 1
@@ -51,14 +58,15 @@ const CreateEvent = ({
           position: 'bottom-right',
           isClosable: true,
         });
+        onClose();
         return false;
       }
       if (response.status === 409) {
-        console.log(response.data);
+        const conflitingEvents = formatTitleEvents(response.data);
         toast({
           title: 'Conflito de eventos.',
           description:
-            'Não foi possível criar o evento, pois ele conflita com outro(s) evento(s).',
+          `Não foi possível criar o evento, pois ele conflita com o(s) seguinte(s) evento(s): ${conflitingEvents}`,
           status: 'success',
           duration: 5000,
           variant: 'solid',
@@ -69,6 +77,21 @@ const CreateEvent = ({
       }
       return false;
     } catch (error) {
+      
+      if (error.response.status === 409) {
+        const conflitingEvents = formatTitleEvents(error.response.data);
+        toast({
+          title: 'Conflito de eventos.',
+          description:
+            `Não foi possível criar o evento, pois ele conflita com o(s) seguinte(s) evento(s): ${conflitingEvents}`,
+          status: 'error',
+          duration: 5000,
+          variant: 'solid',
+          position: 'bottom-right',
+          isClosable: true,
+        });
+        return false;
+      }
       toast({
         title: 'Erro ao criar o evento.',
         description:
@@ -79,7 +102,6 @@ const CreateEvent = ({
         position: 'bottom-right',
         isClosable: true,
       });
-      console.log(error);
       return false;
     }
   }

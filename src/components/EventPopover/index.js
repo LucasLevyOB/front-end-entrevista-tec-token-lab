@@ -38,6 +38,13 @@ const EventPopover = forwardRef(({ event, handleEvents, date }, ref) => {
     handleEvents({ type: 'DELETE', payload: event.eve_id });
   }
 
+  function formatTitleEvents(events) {
+    const conflitingEvents = events.reduce((_, curr) => {
+      return `${curr.eve_title},`;
+    }, '').replace(/,$/, '.');
+    return conflitingEvents;
+  }
+
   function updateEventFromArray(dataForm) {
     const [eve_date_begin, eve_time_begin] = dataForm.fullDateBegin.split('T');
     const [eve_date_end, eve_time_end] = dataForm.fullDateEnd.split('T');
@@ -99,14 +106,16 @@ const EventPopover = forwardRef(({ event, handleEvents, date }, ref) => {
           position: 'bottom-right',
           isClosable: true,
         });
+        onClose();
         return true;
       }
       if (response.status === 409) {
+        const conflitingEvents = formatTitleEvents(response.data);
         toast({
           title: 'Conflito de eventos.',
           description:
-            'Não foi possível atualizar o evento, pois ele conflita com outro(s) evento(s).',
-          status: 'success',
+            `Não foi possível atualizar o evento, pois ele conflita com o(s) evento(s): ${conflitingEvents}`,
+          status: 'error',
           duration: 5000,
           variant: 'solid',
           position: 'bottom-right',
@@ -116,6 +125,20 @@ const EventPopover = forwardRef(({ event, handleEvents, date }, ref) => {
       }
       return false;
     } catch (error) {
+      if (error.response.status === 409) {
+        const conflitingEvents = formatTitleEvents(error.response.data);
+        toast({
+          title: 'Conflito de eventos.',
+          description:
+            `Não foi possível atualizar o evento, pois ele conflita com o(s) evento(s): ${conflitingEvents}`,
+          status: 'error',
+          duration: 5000,
+          variant: 'solid',
+          position: 'bottom-right',
+          isClosable: true,
+        });
+        return false;
+      }
       toast({
         title: 'Erro ao atualizar o evento.',
         description:
